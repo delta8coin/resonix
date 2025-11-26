@@ -1,24 +1,306 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import * as Tone from 'tone';
+import {
+  CHAKRAS,
+  CHAKRANOTE_MAPPINGS,
+  type TuningSystem,
+  type InstrumentType,
+  type BackgroundType,
+} from '@/lib/resonixChakraSynth';
 
 export default function PreviewPage() {
+  const [tuning, setTuning] = useState<TuningSystem>('scientific');
+  const [instrument, setInstrument] = useState<InstrumentType>('piano');
   const [minutes, setMinutes] = useState(5);
+  const [volumeSweep, setVolumeSweep] = useState(true);
+  const [background, setBackground] = useState<BackgroundType>('rain');
+  const [downloadFormat, setDownloadFormat] = useState<'wav' | 'mp3' | 'ogg'>('wav');
   const [isPlaying, setIsPlaying] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [showFrequencyTable, setShowFrequencyTable] = useState(false);
+  const [currentChakra, setCurrentChakra] = useState<number>(0);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [previewChakra, setPreviewChakra] = useState<number | null>(null);
+
+  const synthRef = useRef<Tone.PolySynth | Tone.FMSynth | Tone.Oscillator | null>(null);
+  const binauralLeftRef = useRef<Tone.Oscillator | null>(null);
+  const binauralRightRef = useRef<Tone.Oscillator | null>(null);
+  const backgroundNoiseRef = useRef<Tone.Noise | null>(null);
+  const backgroundFilterRef = useRef<Tone.Filter | null>(null);
+  const reverbRef = useRef<Tone.Reverb | null>(null);
+  const chorusRef = useRef<Tone.Chorus | null>(null);
+  const mainGainRef = useRef<Tone.Gain | null>(null);
+  const backgroundGainRef = useRef<Tone.Gain | null>(null);
+  const chimeRef = useRef<Tone.MetalSynth | null>(null);
+  const previewSynthRef = useRef<Tone.Oscillator | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const totalMinutes = minutes * 7;
 
-  const chakraData = [
-    { chakra: 'Root', note: 'C4', frequency: '256 Hz', sensation: 'Grounding, stability, physical presence' },
-    { chakra: 'Sacral', note: 'D4', frequency: '288 Hz', sensation: 'Creativity, pleasure, emotional flow' },
-    { chakra: 'Solar Plexus', note: 'E4', frequency: '320 Hz', sensation: 'Personal power, confidence, willpower' },
-    { chakra: 'Heart', note: 'F4', frequency: '341.3 Hz', sensation: 'Love, compassion, connection' },
-    { chakra: 'Throat', note: 'G4', frequency: '384 Hz', sensation: 'Expression, truth, communication' },
-    { chakra: 'Third Eye', note: 'A4', frequency: '426.7 Hz', sensation: 'Intuition, insight, inner vision' },
-    { chakra: 'Crown', note: 'B4', frequency: '480 Hz', sensation: 'Unity, enlightenment, divine connection' },
-  ];
+  const chakraData = CHAKRANOTE_MAPPINGS;
+
+  useEffect(() => {
+    // Initialize effects once
+    if (!reverbRef.current) {
+      reverbRef.current = new Tone.Reverb({ decay: 3.5, wet: 0.3 }).toDestination();
+      reverbRef.current.generate();
+    }
+    if (!chorusRef.current) {
+      chorusRef.current = new Tone.Chorus({ frequency: 1.5, delayTime: 3.5, depth: 0.7, wet: 0.4 }).toDestination();
+    }
+    if (!mainGainRef.current) {
+      mainGainRef.current = new Tone.Gain(0.7).toDestination();
+    }
+    if (!backgroundGainRef.current) {
+      backgroundGainRef.current = new Tone.Gain(0.15).toDestination();
+    }
+    if (!chimeRef.current) {
+      chimeRef.current = new Tone.MetalSynth({
+        envelope: { attack: 0.001, decay: 0.5, release: 1 },
+        harmonicity: 5.1,
+        modulationIndex: 32,
+        resonance: 4000,
+        octaves: 1.5,
+        volume: -18,
+      }).toDestination();
+    }
+
+    return () => {
+      cleanupAll();
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  const cleanupSynth = () => {
+    if (synthRef.current) {
+      synthRef.current.dispose();
+      synthRef.current = null;
+    }
+    if (binauralLeftRef.current) {
+      binauralLeftRef.current.dispose();
+      binauralLeftRef.current = null;
+    }
+    if (binauralRightRef.current) {
+      binauralRightRef.current.dispose();
+      binauralRightRef.current = null;
+    }
+  };
+
+  const cleanupBackground = () => {
+    if (backgroundNoiseRef.current) {
+      backgroundNoiseRef.current.stop();
+      backgroundNoiseRef.current.dispose();
+      backgroundNoiseRef.current = null;
+    }
+    if (backgroundFilterRef.current) {
+      backgroundFilterRef.current.dispose();
+      backgroundFilterRef.current = null;
+    }
+  };
+
+  const cleanupAll = () => {
+    cleanupSynth();
+    cleanupBackground();
+    if (reverbRef.current) {
+      reverbRef.current.dispose();
+      reverbRef.current = null;
+    }
+    if (chorusRef.current) {
+      chorusRef.current.dispose();
+      chorusRef.current = null;
+    }
+    if (mainGainRef.current) {
+      mainGainRef.current.dispose();
+      mainGainRef.current = null;
+    }
+    if (backgroundGainRef.current) {
+      backgroundGainRef.current.dispose();
+      backgroundGainRef.current = null;
+    }
+    if (chimeRef.current) {
+      chimeRef.current.dispose();
+      chimeRef.current = null;
+    }
+  };
+
+  const setupBackground = () => {
+    if (background === 'none') return;
+
+    cleanupBackground();
+
+    backgroundNoiseRef.current = new Tone.Noise('pink');
+    backgroundFilterRef.current = new Tone.Filter({
+      frequency: background === 'rain' ? 2000 : background === 'ocean' ? 400 : 800,
+      type: 'lowpass',
+      rolloff: -24,
+    });
+
+    const lfo = new Tone.LFO(background === 'ocean' ? 0.1 : 0.3, 0.2, 1);
+    lfo.connect(backgroundFilterRef.current.frequency);
+    lfo.start();
+
+    backgroundNoiseRef.current.chain(backgroundFilterRef.current, backgroundGainRef.current!);
+    backgroundNoiseRef.current.start();
+  };
+
+  const setupInstrument = (chakraIndex: number) => {
+    cleanupSynth();
+
+    const freq =
+      tuning === 'scientific'
+        ? CHAKRAS[chakraIndex].scientificFreq
+        : CHAKRAS[chakraIndex].solfeggioFreq;
+
+    if (instrument === 'piano') {
+      const piano = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: 'sine' },
+        envelope: { attack: 0.01, decay: 0.5, sustain: 0.7, release: 2 },
+        volume: -6,
+      });
+      piano.chain(reverbRef.current!, mainGainRef.current!);
+      synthRef.current = piano;
+
+      const notes = [freq, freq * 1.25, freq * 1.5, freq * 2];
+      const now = Tone.now();
+      const duration = minutes * 60;
+      notes.forEach((note, i) => {
+        piano.triggerAttackRelease(note, duration / 4, now + i * (duration / 4));
+      });
+    } else if (instrument === 'bowls') {
+      const bowls = new Tone.FMSynth({
+        harmonicity: 1.4,
+        modulationIndex: 12,
+        oscillator: { type: 'sine' },
+        envelope: { attack: 0.1, decay: 2, sustain: 0.8, release: 10 },
+        modulation: { type: 'sine' },
+        modulationEnvelope: { attack: 0.5, decay: 1, sustain: 0.6, release: 8 },
+        volume: -8,
+      });
+      bowls.chain(chorusRef.current!, reverbRef.current!, mainGainRef.current!);
+      synthRef.current = bowls;
+      bowls.triggerAttackRelease(freq, minutes * 60);
+    } else if (instrument === 'sine') {
+      const osc = new Tone.Oscillator(freq, 'sine').start();
+      osc.connect(mainGainRef.current!);
+      synthRef.current = osc;
+    } else if (instrument === 'square') {
+      const osc = new Tone.Oscillator(freq, 'square').start();
+      osc.connect(mainGainRef.current!);
+      synthRef.current = osc;
+    } else if (instrument === 'binaural') {
+      const carrier = 150 + freq / 10;
+      const beatFreq = 7;
+      const panLeft = new Tone.Panner(-1).toDestination();
+      const panRight = new Tone.Panner(1).toDestination();
+
+      binauralLeftRef.current = new Tone.Oscillator(carrier - beatFreq / 2, 'sine').start();
+      binauralRightRef.current = new Tone.Oscillator(carrier + beatFreq / 2, 'sine').start();
+
+      binauralLeftRef.current.chain(panLeft, mainGainRef.current!);
+      binauralRightRef.current.chain(panRight, mainGainRef.current!);
+    }
+
+    if (volumeSweep && mainGainRef.current) {
+      const volume = -12 + (chakraIndex / 6) * 12;
+      mainGainRef.current.gain.setValueAtTime(Tone.dbToGain(volume), Tone.now());
+    }
+  };
+
+  const handlePlay = async () => {
+    await Tone.start();
+    setIsPlaying(true);
+    setCurrentChakra(0);
+    setTimeElapsed(0);
+
+    setupBackground();
+    setupInstrument(0);
+
+    const chakraDuration = minutes * 60;
+    let elapsed = 0;
+
+    intervalRef.current = setInterval(() => {
+      elapsed += 1;
+      setTimeElapsed(elapsed);
+
+      const currentChakraIndex = Math.floor(elapsed / chakraDuration);
+
+      if (currentChakraIndex >= 7) {
+        handleStop();
+        return;
+      }
+
+      if (currentChakraIndex !== Math.floor((elapsed - 1) / chakraDuration)) {
+        setCurrentChakra(currentChakraIndex);
+
+        if (chimeRef.current) {
+          chimeRef.current.triggerAttackRelease(1200, 0.1);
+        }
+
+        if (mainGainRef.current) {
+          const currentVolume = volumeSweep ? -12 + (currentChakraIndex / 6) * 12 : 0;
+          mainGainRef.current.gain.linearRampToValueAtTime(
+            Tone.dbToGain(currentVolume - 6),
+            Tone.now() + 6
+          );
+          mainGainRef.current.gain.linearRampToValueAtTime(
+            Tone.dbToGain(currentVolume),
+            Tone.now() + 12
+          );
+        }
+
+        setupInstrument(currentChakraIndex);
+      }
+    }, 1000);
+  };
+
+  const handleStop = () => {
+    setIsPlaying(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    cleanupSynth();
+    cleanupBackground();
+    setCurrentChakra(0);
+    setTimeElapsed(0);
+  };
+
+  const handlePreview = async (chakraIndex: number) => {
+    await Tone.start();
+
+    if (previewSynthRef.current) {
+      previewSynthRef.current.stop();
+      previewSynthRef.current.dispose();
+    }
+
+    const freq =
+      tuning === 'scientific'
+        ? CHAKRAS[chakraIndex].scientificFreq
+        : CHAKRAS[chakraIndex].solfeggioFreq;
+
+    const osc = new Tone.Oscillator(freq, 'sine').toDestination();
+    osc.volume.value = -12;
+    osc.start();
+
+    previewSynthRef.current = osc;
+    setPreviewChakra(chakraIndex);
+
+    setTimeout(() => {
+      osc.stop();
+      osc.dispose();
+      setPreviewChakra(null);
+    }, 2000);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const progress = totalMinutes > 0 ? (timeElapsed / (totalMinutes * 60)) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -99,7 +381,7 @@ export default function PreviewPage() {
                         <tr key={i} className="border-b border-[var(--border)] hover:bg-white/5 transition-colors">
                           <td className="py-3 px-4 font-medium text-white">{row.chakra}</td>
                           <td className="py-3 px-4 font-mono font-bold text-[var(--text-primary)]">{row.note}</td>
-                          <td className="py-3 px-4 font-mono text-[var(--text-primary)]">{row.frequency}</td>
+                          <td className="py-3 px-4 font-mono text-[var(--text-primary)]">{row.frequency} Hz</td>
                           <td className="py-3 px-4 text-[var(--text-secondary)] text-xs">{row.sensation}</td>
                         </tr>
                       ))}
@@ -114,44 +396,22 @@ export default function PreviewPage() {
               {chakraData.map((data, i) => (
                 <button
                   key={data.chakra}
-                  className="relative p-4 rounded border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg group"
+                  disabled={isPlaying}
+                  className="relative p-4 rounded border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg group disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    borderColor: [
-                      'var(--chakra-root)',
-                      'var(--chakra-sacral)',
-                      'var(--chakra-solar)',
-                      'var(--chakra-heart)',
-                      'var(--chakra-throat)',
-                      'var(--chakra-third-eye)',
-                      'var(--chakra-crown)',
-                    ][i],
-                    backgroundColor: [
-                      'var(--chakra-root)',
-                      'var(--chakra-sacral)',
-                      'var(--chakra-solar)',
-                      'var(--chakra-heart)',
-                      'var(--chakra-throat)',
-                      'var(--chakra-third-eye)',
-                      'var(--chakra-crown)',
-                    ][i] + '22',
+                    borderColor: CHAKRAS[i].color,
+                    backgroundColor: CHAKRAS[i].color + '22',
                   }}
-                  onClick={() => console.log(`Playing ${data.chakra} - ${data.frequency}`)}
+                  onClick={() => handlePreview(i)}
                 >
                   <div className="text-xs font-bold mb-1 text-white">{data.chakra}</div>
-                  <div className="text-xs opacity-75 text-white font-mono">{data.frequency}</div>
-                  <div className="absolute inset-0 rounded opacity-0 group-hover:opacity-50 transition-opacity"
-                    style={{
-                      backgroundColor: [
-                        'var(--chakra-root)',
-                        'var(--chakra-sacral)',
-                        'var(--chakra-solar)',
-                        'var(--chakra-heart)',
-                        'var(--chakra-throat)',
-                        'var(--chakra-third-eye)',
-                        'var(--chakra-crown)',
-                      ][i],
-                    }}
-                  />
+                  <div className="text-xs opacity-75 text-white font-mono">{data.frequency} Hz</div>
+                  {previewChakra === i && (
+                    <div
+                      className="absolute inset-0 rounded opacity-50 animate-pulse"
+                      style={{ backgroundColor: CHAKRAS[i].color }}
+                    />
+                  )}
                 </button>
               ))}
             </div>
@@ -164,7 +424,12 @@ export default function PreviewPage() {
                   <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-3">
                     Tuning System
                   </label>
-                  <select className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer">
+                  <select
+                    value={tuning}
+                    onChange={(e) => setTuning(e.target.value as TuningSystem)}
+                    disabled={isPlaying}
+                    className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer disabled:opacity-50"
+                  >
                     <option value="scientific">Scientific (256-480 Hz)</option>
                     <option value="solfeggio">Solfeggio (396-963 Hz)</option>
                   </select>
@@ -175,7 +440,12 @@ export default function PreviewPage() {
                   <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-3">
                     Instrument / Sound
                   </label>
-                  <select className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer">
+                  <select
+                    value={instrument}
+                    onChange={(e) => setInstrument(e.target.value as InstrumentType)}
+                    disabled={isPlaying}
+                    className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer disabled:opacity-50"
+                  >
                     <option value="piano">Grand Piano</option>
                     <option value="bowls">Tibetan Singing Bowls</option>
                     <option value="sine">Pure Sine Wave</option>
@@ -189,7 +459,12 @@ export default function PreviewPage() {
                   <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-3">
                     Background Ambience
                   </label>
-                  <select className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer">
+                  <select
+                    value={background}
+                    onChange={(e) => setBackground(e.target.value as BackgroundType)}
+                    disabled={isPlaying}
+                    className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer disabled:opacity-50"
+                  >
                     <option value="rain">Gentle Rain</option>
                     <option value="none">None</option>
                     <option value="ocean">Ocean Waves</option>
@@ -202,7 +477,12 @@ export default function PreviewPage() {
                   <label className="block text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-3">
                     Download Format
                   </label>
-                  <select className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer">
+                  <select
+                    value={downloadFormat}
+                    onChange={(e) => setDownloadFormat(e.target.value as 'wav' | 'mp3' | 'ogg')}
+                    disabled={isPlaying || isDownloading}
+                    className="w-full px-5 py-4 bg-[var(--tesla-gray)] border-2 border-[var(--border)] rounded text-white font-medium transition-all hover:border-[var(--text-muted)] hover:bg-[var(--tesla-light-gray)] focus:border-white focus:bg-[var(--tesla-light-gray)] focus:outline-none cursor-pointer disabled:opacity-50"
+                  >
                     <option value="wav">WAV (Highest Quality)</option>
                     <option value="mp3">MP3 (Compressed)</option>
                     <option value="ogg">OGG (Open Source)</option>
@@ -224,13 +504,15 @@ export default function PreviewPage() {
                   max="15"
                   value={minutes}
                   onChange={(e) => setMinutes(Number(e.target.value))}
+                  disabled={isPlaying}
                   className="w-full h-1 bg-[var(--border)] rounded-full appearance-none cursor-pointer
                     [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6
                     [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
                     [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110
                     [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:bg-white
                     [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer
-                    [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:hover:scale-110"
+                    [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:hover:scale-110
+                    disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -239,7 +521,10 @@ export default function PreviewPage() {
                 <input
                   type="checkbox"
                   id="volumeSweep"
-                  className="w-6 h-6 cursor-pointer accent-white"
+                  checked={volumeSweep}
+                  onChange={(e) => setVolumeSweep(e.target.checked)}
+                  disabled={isPlaying}
+                  className="w-6 h-6 cursor-pointer accent-white disabled:opacity-50"
                 />
                 <label htmlFor="volumeSweep" className="text-base font-medium cursor-pointer">
                   Volume Sweep: Quiet Root → Loud Crown
@@ -249,8 +534,9 @@ export default function PreviewPage() {
               {/* Action Buttons */}
               <div className="flex gap-4 my-10">
                 <button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className={`flex-1 px-8 py-5 font-semibold uppercase text-sm tracking-wide rounded transition-all ${
+                  onClick={isPlaying ? handleStop : handlePlay}
+                  disabled={isDownloading}
+                  className={`flex-1 px-8 py-5 font-semibold uppercase text-sm tracking-wide rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     isPlaying
                       ? 'bg-[var(--tesla-red)] text-white hover:bg-[#c01d23]'
                       : 'bg-white text-black hover:bg-[var(--tesla-off-white)] hover:shadow-lg hover:-translate-y-px active:translate-y-0'
@@ -263,21 +549,67 @@ export default function PreviewPage() {
                     setIsDownloading(true);
                     setTimeout(() => setIsDownloading(false), 2000);
                   }}
-                  className="flex-1 px-8 py-5 font-semibold uppercase text-sm tracking-wide rounded transition-all bg-transparent text-white border-2 border-white hover:bg-white hover:text-black"
+                  disabled={isPlaying || isDownloading}
+                  className="flex-1 px-8 py-5 font-semibold uppercase text-sm tracking-wide rounded transition-all bg-transparent text-white border-2 border-white hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isDownloading ? 'Preparing...' : '⬇ Download Song'}
                 </button>
               </div>
 
+              {/* Progress */}
+              {isPlaying && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center gap-4">
+                    <div
+                      className="w-4 h-4 rounded-full animate-pulse"
+                      style={{ backgroundColor: CHAKRAS[currentChakra].color }}
+                    />
+                    <div className="text-center">
+                      <div className="text-2xl font-bold" style={{ color: CHAKRAS[currentChakra].color }}>
+                        {CHAKRAS[currentChakra].name}
+                      </div>
+                      <div className="text-sm text-[var(--text-secondary)]">
+                        {tuning === 'scientific'
+                          ? CHAKRAS[currentChakra].scientificFreq
+                          : CHAKRAS[currentChakra].solfeggioFreq}{' '}
+                        Hz • {CHAKRANOTE_MAPPINGS[currentChakra].note}
+                      </div>
+                    </div>
+                    <div
+                      className="w-4 h-4 rounded-full animate-pulse"
+                      style={{ backgroundColor: CHAKRAS[currentChakra].color }}
+                    />
+                  </div>
+
+                  <div className="flex justify-between text-sm text-[var(--text-secondary)] px-2">
+                    <span>{formatTime(timeElapsed)}</span>
+                    <span>Chakra {currentChakra + 1} of 7</span>
+                    <span>{formatTime(totalMinutes * 60)}</span>
+                  </div>
+
+                  <div className="w-full h-3 bg-[var(--tesla-gray)] rounded-full overflow-hidden relative">
+                    <div
+                      className="h-full transition-all duration-1000 ease-linear"
+                      style={{
+                        width: `${progress}%`,
+                        background: `linear-gradient(to right, ${CHAKRAS[0].color}, ${CHAKRAS[currentChakra].color})`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Info Bar */}
-              <div className="bg-[var(--tesla-gray)] p-6 rounded text-center mt-8">
-                <p className="text-white font-medium mb-1">
-                  ✨ Real-time browser playback • Smooth crossfades • Soft chime transitions
-                </p>
-                <p className="text-[var(--text-secondary)] text-sm">
-                  {totalMinutes} minute journey through all 7 chakras
-                </p>
-              </div>
+              {!isPlaying && (
+                <div className="bg-[var(--tesla-gray)] p-6 rounded text-center mt-8">
+                  <p className="text-white font-medium mb-1">
+                    ✨ Real-time browser playback • Smooth crossfades • Soft chime transitions
+                  </p>
+                  <p className="text-[var(--text-secondary)] text-sm">
+                    {totalMinutes} minute journey through all 7 chakras
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

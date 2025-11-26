@@ -18,6 +18,8 @@ export default function Footer() {
           <p>MedBed Spa™</p>
           <p>MedBed Capsule™</p>
           <p>MedBed Pets™</p>
+          <p>MedBed Hospital™</p>
+          <p>MedBed Pad™</p>
         </div>
         <p className="text-gray-600 text-xs mt-6">
           © 2025 All trademarks are the property of their respective owners.
