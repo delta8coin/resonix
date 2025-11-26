@@ -1062,7 +1062,7 @@ export default function ChakraActivator() {
         {/* Info */}
         <div className="mt-8 text-center text-sm text-gray-500">
           <p className="mb-2">
-            ✨ Real-time browser playback • Smooth crossfades • Soft chime transitions • 100% Tone.js synthesis
+            ✨ Real-time browser playback • Smooth crossfades • Soft chime transitions
           </p>
           <p>
             {totalDuration} minute journey through all 7 chakras
