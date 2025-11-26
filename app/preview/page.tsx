@@ -538,8 +538,8 @@ export default function PreviewPage() {
                   disabled={isDownloading}
                   className={`flex-1 px-8 py-5 font-semibold uppercase text-sm tracking-wide rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     isPlaying
-                      ? 'bg-[var(--tesla-red)] text-white hover:bg-[#c01d23]'
-                      : 'bg-white text-black hover:bg-[var(--tesla-off-white)] hover:shadow-lg hover:-translate-y-px active:translate-y-0'
+                      ? 'bg-white text-black hover:bg-[var(--tesla-off-white)] hover:shadow-lg hover:-translate-y-px active:translate-y-0'
+                      : 'bg-[var(--tesla-red)] text-white hover:bg-[#c01d23] hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-px active:translate-y-0'
                   }`}
                 >
                   {isPlaying ? '⏸ Stop Journey' : '▶ Begin Chakra Journey'}
@@ -550,7 +550,7 @@ export default function PreviewPage() {
                     setTimeout(() => setIsDownloading(false), 2000);
                   }}
                   disabled={isPlaying || isDownloading}
-                  className="flex-1 px-8 py-5 font-semibold uppercase text-sm tracking-wide rounded transition-all bg-transparent text-white border-2 border-white hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-8 py-5 font-semibold uppercase text-sm tracking-wide rounded transition-all bg-[var(--tesla-red)] text-white hover:bg-[#c01d23] hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-px active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isDownloading ? 'Preparing...' : '⬇ Download Song'}
                 </button>
