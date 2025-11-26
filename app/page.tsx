@@ -377,6 +377,73 @@ export default function PreviewPage() {
         </header>
 
         <main>
+          {/* Product Showcase */}
+          <section className="my-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[var(--tesla-dark)] border border-[var(--border)] rounded-lg p-10">
+              {/* Product Image */}
+              <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-gray-900 to-black">
+                <img
+                  src="/medbed-pad.png"
+                  alt="Resonix MedBed Pad"
+                  className="w-full h-full object-contain p-8"
+                />
+              </div>
+
+              {/* Product Info */}
+              <div>
+                <h3 className="text-3xl font-semibold mb-3 tracking-tight">Resonix MedBed Pad</h3>
+                <p className="text-[var(--text-secondary)] mb-6">
+                  The world&apos;s first fully app-controlled biophoton + PEMF healing mat
+                </p>
+
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-3 mb-3">
+                    <span className="text-4xl font-bold">$650</span>
+                    <span className="bg-[var(--tesla-red)] text-white px-3 py-1 rounded text-sm font-semibold">
+                      Pre-order: $499
+                    </span>
+                  </div>
+                  <p className="text-sm text-[var(--text-secondary)]">First 500 units only</p>
+                </div>
+
+                <ul className="space-y-3 mb-8 text-[var(--text-secondary)]">
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">✓</span>
+                    <span>8 pure copper PEMF coils (1–30 Hz)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">✓</span>
+                    <span>1,024× biophoton amplification</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">✓</span>
+                    <span>Full 5G/EMF shielding layer</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-500 mt-1">✓</span>
+                    <span>30+ nights per charge</span>
+                  </li>
+                </ul>
+
+                <div className="flex gap-3">
+                  <a
+                    href="/product"
+                    className="flex-1 px-6 py-3 bg-[var(--tesla-red)] text-white rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-[#c01d23] hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-px text-center"
+                  >
+                    View Details
+                  </a>
+                  <button className="px-6 py-3 bg-transparent text-white border-2 border-white rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-white hover:text-black">
+                    Pre-order
+                  </button>
+                </div>
+
+                <p className="text-xs text-[var(--text-secondary)] mt-4">
+                  Ships Q1 2026 • 90-night guarantee • 3-year warranty
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* Config Panel */}
           <div className="bg-[var(--tesla-dark)] rounded-lg my-12 overflow-hidden border border-[var(--border)] animate-fade-in-up">
             {/* Preset Banner */}
@@ -385,6 +452,9 @@ export default function PreviewPage() {
               <h2 className="text-3xl font-semibold mb-3 tracking-tight">
                 ✨ ChakraNote Exact Frequency
               </h2>
+              <p className="text-[var(--text-secondary)] font-medium mb-2 tracking-tight">
+                Or listen on your phone or online
+              </p>
               <p className="text-[var(--text-secondary)] font-medium mb-2 tracking-tight">
                 Scientific Tuning (C4–B4 Scale) • 256–480 Hz
               </p>
@@ -654,82 +724,6 @@ export default function PreviewPage() {
               )}
             </div>
           </div>
-
-          {/* Product Showcase */}
-          <section className="my-24">
-            <div className="mb-12 text-center">
-              <h2 className="text-4xl md:text-5xl font-semibold mb-4 tracking-tight">
-                Featured Product
-              </h2>
-              <p className="text-lg text-[var(--text-secondary)]">
-                Turn any bed into a real MedBed
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-[var(--tesla-dark)] border border-[var(--border)] rounded-lg p-10">
-              {/* Product Image */}
-              <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-gray-900 to-black">
-                <img
-                  src="/medbed-pad.png"
-                  alt="Resonix MedBed Pad"
-                  className="w-full h-full object-contain p-8"
-                />
-              </div>
-
-              {/* Product Info */}
-              <div>
-                <h3 className="text-3xl font-semibold mb-3 tracking-tight">Resonix MedBed Pad</h3>
-                <p className="text-[var(--text-secondary)] mb-6">
-                  The world&apos;s first fully app-controlled biophoton + PEMF healing mat
-                </p>
-
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-3 mb-3">
-                    <span className="text-4xl font-bold">$650</span>
-                    <span className="bg-[var(--tesla-red)] text-white px-3 py-1 rounded text-sm font-semibold">
-                      Pre-order: $499
-                    </span>
-                  </div>
-                  <p className="text-sm text-[var(--text-secondary)]">First 500 units only</p>
-                </div>
-
-                <ul className="space-y-3 mb-8 text-[var(--text-secondary)]">
-                  <li className="flex items-start gap-2">
-                    <span className="text-purple-500 mt-1">✓</span>
-                    <span>8 pure copper PEMF coils (1–30 Hz)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-purple-500 mt-1">✓</span>
-                    <span>1,024× biophoton amplification</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-purple-500 mt-1">✓</span>
-                    <span>Full 5G/EMF shielding layer</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-purple-500 mt-1">✓</span>
-                    <span>30+ nights per charge</span>
-                  </li>
-                </ul>
-
-                <div className="flex gap-3">
-                  <a
-                    href="/product"
-                    className="flex-1 px-6 py-3 bg-[var(--tesla-red)] text-white rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-[#c01d23] hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-px text-center"
-                  >
-                    View Details
-                  </a>
-                  <button className="px-6 py-3 bg-transparent text-white border-2 border-white rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-white hover:text-black">
-                    Pre-order
-                  </button>
-                </div>
-
-                <p className="text-xs text-[var(--text-secondary)] mt-4">
-                  Ships Q1 2026 • 90-night guarantee • 3-year warranty
-                </p>
-              </div>
-            </div>
-          </section>
 
           {/* Audio Library */}
           <section className="my-16">
