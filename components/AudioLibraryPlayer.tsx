@@ -8,10 +8,11 @@ interface AudioLibraryPlayerProps {
 }
 
 export default function AudioLibraryPlayer({ tracks }: AudioLibraryPlayerProps) {
-  const [currentTrack, setCurrentTrack] = useState<AudioTrack | null>(tracks[0] || null);
+  const [currentTrack] = useState<AudioTrack | null>(tracks[0] || null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [copied, setCopied] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -59,6 +60,26 @@ export default function AudioLibraryPlayer({ tracks }: AudioLibraryPlayerProps) 
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleCopyLink = async () => {
+    if (!currentTrack) return;
+    const url = `${window.location.origin}${currentTrack.url}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleDownload = () => {
+    if (!currentTrack) return;
+    const a = document.createElement('a');
+    a.href = currentTrack.url;
+    a.download = currentTrack.url.split('/').pop() || 'chakra-journey.wav';
+    a.click();
   };
 
   if (!currentTrack) return null;
@@ -141,6 +162,40 @@ export default function AudioLibraryPlayer({ tracks }: AudioLibraryPlayerProps) 
           <div className="text-gray-400">Duration</div>
           <div className="text-white font-semibold">{currentTrack.duration}</div>
         </div>
+      </div>
+
+      {/* Share and Download Buttons */}
+      <div className="mt-6 flex gap-4">
+        <button
+          onClick={handleCopyLink}
+          className="flex-1 py-3 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-[1.02] transition-all font-medium flex items-center justify-center gap-2"
+        >
+          {copied ? (
+            <>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Link Copied!
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+              </svg>
+              Share Link
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={handleDownload}
+          className="flex-1 py-3 px-4 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 hover:shadow-xl hover:shadow-green-500/50 hover:scale-[1.02] transition-all font-medium flex items-center justify-center gap-2"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+          Download
+        </button>
       </div>
     </div>
   );
