@@ -22,8 +22,8 @@ export default function Footer() {
 
       {/* Trademarks Section */}
       <div className="text-center py-8 border-t border-gray-200">
-        <h4 className="text-base text-gray-800 font-semibold mb-4">Trademarks</h4>
-        <div className="space-y-2 text-gray-600 text-sm">
+        <h4 className="text-base text-gray-800 font-semibold mb-6">Trademarks</h4>
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-gray-600 text-sm max-w-3xl mx-auto">
           <p>Resonix™</p>
           <p>MedBed Spa™</p>
           <p>MedBed Capsule™</p>
