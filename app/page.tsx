@@ -12,7 +12,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="mb-8 text-center">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent mb-3">
-              Pre-Made Chakra Journeys
+              Pre-Made Healing Journeys
             </h2>
             <p className="text-gray-400 text-lg">
               Ready-to-play chakra activation audio • Perfect for immediate meditation
