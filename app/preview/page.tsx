@@ -6,8 +6,19 @@ export default function PreviewPage() {
   const [minutes, setMinutes] = useState(5);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showFrequencyTable, setShowFrequencyTable] = useState(false);
 
   const totalMinutes = minutes * 7;
+
+  const chakraData = [
+    { chakra: 'Root', note: 'C4', frequency: '256 Hz', sensation: 'Grounding, stability, physical presence' },
+    { chakra: 'Sacral', note: 'D4', frequency: '288 Hz', sensation: 'Creativity, pleasure, emotional flow' },
+    { chakra: 'Solar Plexus', note: 'E4', frequency: '320 Hz', sensation: 'Personal power, confidence, willpower' },
+    { chakra: 'Heart', note: 'F4', frequency: '341.3 Hz', sensation: 'Love, compassion, connection' },
+    { chakra: 'Throat', note: 'G4', frequency: '384 Hz', sensation: 'Expression, truth, communication' },
+    { chakra: 'Third Eye', note: 'A4', frequency: '426.7 Hz', sensation: 'Intuition, insight, inner vision' },
+    { chakra: 'Crown', note: 'B4', frequency: '480 Hz', sensation: 'Unity, enlightenment, divine connection' },
+  ];
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -58,10 +69,45 @@ export default function PreviewPage() {
               <p className="text-[var(--text-secondary)] font-medium mb-2 tracking-tight">
                 Scientific Tuning (C4–B4 Scale) • 256–480 Hz
               </p>
-              <p className="text-[var(--text-muted)] max-w-[800px]">
+              <p className="text-[var(--text-muted)] max-w-[800px] mb-4">
                 Precision-mapped chakra frequencies to musical notes • Grand piano with gentle rain ambience • Best for meditation & healing
               </p>
+              <button
+                onClick={() => setShowFrequencyTable(!showFrequencyTable)}
+                className="text-sm text-[var(--text-secondary)] hover:text-white transition-colors underline"
+              >
+                {showFrequencyTable ? '✕ Hide' : '→ View'} Exact Frequency Mapping
+              </button>
             </div>
+
+            {/* Frequency Table */}
+            {showFrequencyTable && (
+              <div className="bg-black/60 p-8 border-b border-[var(--border)]">
+                <h3 className="text-xl font-semibold mb-4 text-[var(--text-secondary)]">Exact Frequency Mapping</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[var(--border)]">
+                        <th className="text-left py-3 px-4 font-semibold text-[var(--text-secondary)] uppercase text-xs tracking-wider">Chakra</th>
+                        <th className="text-left py-3 px-4 font-semibold text-[var(--text-secondary)] uppercase text-xs tracking-wider">Note</th>
+                        <th className="text-left py-3 px-4 font-semibold text-[var(--text-secondary)] uppercase text-xs tracking-wider">Frequency</th>
+                        <th className="text-left py-3 px-4 font-semibold text-[var(--text-secondary)] uppercase text-xs tracking-wider">Sensation</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {chakraData.map((row, i) => (
+                        <tr key={i} className="border-b border-[var(--border)] hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-4 font-medium text-white">{row.chakra}</td>
+                          <td className="py-3 px-4 font-mono font-bold text-[var(--text-primary)]">{row.note}</td>
+                          <td className="py-3 px-4 font-mono text-[var(--text-primary)]">{row.frequency}</td>
+                          <td className="py-3 px-4 text-[var(--text-secondary)] text-xs">{row.sensation}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {/* Chakra Bars */}
             <div className="flex h-20 gap-px bg-black">
