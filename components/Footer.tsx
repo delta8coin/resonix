@@ -33,7 +33,7 @@ export default function Footer() {
           <p>MedBed Pad™</p>
         </div>
         <p className="text-gray-500 text-xs mt-6">
-          © 2025 All trademarks are the property of their respective owners.
+          © 2025 All trademarks are the property of <a href="https://myresonix.vercel.app" className="text-purple-600 hover:text-purple-700 underline">https://myresonix.vercel.app</a>
         </p>
       </div>
 
