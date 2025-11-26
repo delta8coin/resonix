@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedBed™ - Turn Any Bed Into A MedBed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tesla-black: #000000;
+            --tesla-dark: #0a0a0a;
+            --tesla-gray: #1a1a1a;
+            --tesla-light-gray: #2a2a2a;
+            --tesla-white: #ffffff;
+            --tesla-off-white: #f4f4f4;
+            --tesla-red: #e82127;
+            --tesla-blue: #3e6ae1;
+            --text-primary: #ffffff;
+            --text-secondary: #999999;
+            --text-muted: #666666;
+            --border: #2a2a2a;
+            
+            --chakra-root: #e82127;
+            --chakra-sacral: #ff6b35;
+            --chakra-solar: #ffd23f;
+            --chakra-heart: #06ffa5;
+            --chakra-throat: #3e6ae1;
+            --chakra-third-eye: #8b5cf6;
+            --chakra-crown: #d946ef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--tesla-black);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        header {
+            padding: 3rem 0 1.5rem;
+            text-align: center;
+            animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            color: var(--tesla-white);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        /* Main Configuration Panel */
+        .config-panel {
+            background: var(--tesla-dark);
+            border-radius: 8px;
+            margin: 3rem 0;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+        }
+
+        /* Preset Banner */
+        .preset-banner {
+            background: linear-gradient(135deg, var(--tesla-gray) 0%, var(--tesla-dark) 100%);
+            padding: 2.5rem 3rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                var(--chakra-root) 0%, 
+                var(--chakra-sacral) 16%, 
+                var(--chakra-solar) 32%, 
+                var(--chakra-heart) 48%, 
+                var(--chakra-throat) 64%, 
+                var(--chakra-third-eye) 80%, 
+                var(--chakra-crown) 100%);
+        }
+
+        .preset-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .preset-recommended {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .preset-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 800px;
+        }
+
+        /* Chakra Frequency Bars */
+        .chakra-bars {
+            display: flex;
+            height: 80px;
+            gap: 1px;
+            background: var(--tesla-black);
+            margin: 0;
+        }
+
+        .chakra-bar {
+            flex: 1;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 0.5rem;
+        }
+
+        .chakra-bar::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: currentColor;
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chakra-bar:hover::before {
+            height: 100%;
+        }
+
+        .chakra-bar span {
+            position: relative;
+            z-index: 1;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            mix-blend-mode: difference;
+        }
+
+        .chakra-bar:hover span {
+            opacity: 1;
+        }
+
+        .chakra-bar:nth-child(1) { color: var(--chakra-root); }
+        .chakra-bar:nth-child(2) { color: var(--chakra-sacral); }
+        .chakra-bar:nth-child(3) { color: var(--chakra-solar); }
+        .chakra-bar:nth-child(4) { color: var(--chakra-heart); }
+        .chakra-bar:nth-child(5) { color: var(--chakra-throat); }
+        .chakra-bar:nth-child(6) { color: var(--chakra-third-eye); }
+        .chakra-bar:nth-child(7) { color: var(--chakra-crown); }
+
+        /* Controls Section */
+        .controls-section {
+            padding: 3rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+        }
+
+        .control-group:nth-child(1) { animation-delay: 0.3s; }
+        .control-group:nth-child(2) { animation-delay: 0.35s; }
+        .control-group:nth-child(3) { animation-delay: 0.4s; }
+        .control-group:nth-child(4) { animation-delay: 0.45s; }
+
+        .control-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--tesla-gray);
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23999999' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.25rem center;
+            padding-right: 3rem;
+        }
+
+        select:hover {
+            border-color: var(--text-muted);
+            background: var(--tesla-light-gray);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--tesla-white);
+            background: var(--tesla-light-gray);
+        }
+
+        /* Slider */
+        .slider-control {
+            margin: 2rem 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.5s backwards;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .slider-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--tesla-white);
+            letter-spacing: -0.02em;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            outline: none;
+            transition: background 0.2s ease;
+        }
+
+        input[type="range"]:hover {
+            background: var(--text-muted);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--tesla-white);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            background: var(--tesla-off-white);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--tesla-white);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            background: var(--tesla-off-white);
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.55s backwards;
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--tesla-white);
+            border: 2px solid var(--border);
+        }
+
+        .checkbox-label {
+            font-size: 1rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        /* Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 2.5rem 0 2rem;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s backwards;
+        }
+
+        button {
+            flex: 1;
+            padding: 1.25rem 2rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--tesla-white);
+            color: var(--tesla-black);
+        }
+
+        .btn-primary:hover {
+            background: var(--tesla-off-white);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--tesla-white);
+            border: 2px solid var(--tesla-white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--tesla-white);
+            color: var(--tesla-black);
+        }
+
+        .btn-stop {
+            background: var(--tesla-red);
+            color: var(--tesla-white);
+        }
+
+        .btn-stop:hover {
+            background: #c01d23;
+        }
+
+        /* Info Bar */
+        .info-bar {
+            background: var(--tesla-gray);
+            padding: 1.5rem;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .info-bar p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0.25rem 0;
+        }
+
+        .info-highlight {
+            color: var(--tesla-white);
+            font-weight: 500;
+        }
+
+        /* Audio Library */
+        .audio-library {
+            margin: 4rem 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.7s backwards;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            font-weight: 400;
+        }
+
+        .track-card {
+            background: var(--tesla-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .track-card:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            gap: 1rem;
+        }
+
+        .track-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .track-duration {
+            background: var(--tesla-gray);
+            padding: 0.5rem 1.25rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+        }
+
+        .track-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .track-tags {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: var(--tesla-gray);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid var(--border);
+        }
+
+        /* Footer */
+        footer {
+            margin: 5rem 0 3rem;
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.8s backwards;
+        }
+
+        .quote-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quote-text {
+            font-size: clamp(1.125rem, 2vw, 1.5rem);
+            font-style: italic;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .quote-author {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .trademarks {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            padding: 1.5rem 0;
+        }
+
+        .trademark {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .copyright {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.8;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.25rem;
+            }
+
+            .config-panel {
+                margin: 2rem 0;
+            }
+
+            .preset-banner {
+                padding: 2rem 1.5rem;
+            }
+
+            .controls-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .track-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .track-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .chakra-bar span {
+                font-size: 0.65rem;
+            }
+        }
+
+        /* Loading state animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Turn Any Bed Into A MedBed™</h1>
+            <p class="subtitle">Synthesize personalized 7-chakra frequency Healing journeys</p>
+        </header>
+
+        <main>
+            <div class="config-panel">
+                <div class="preset-banner">
+                    <h2 class="preset-title">✨ ChakraNote Exact Frequency</h2>
+                    <p class="preset-recommended">Scientific Tuning (C4–B4 Scale) • 256–480 Hz</p>
+                    <p class="preset-description">Precision-mapped chakra frequencies to musical notes • Grand piano with gentle rain ambience • Best for meditation & healing</p>
+                </div>
+
+                <div class="chakra-bars">
+                    <div class="chakra-bar"><span>Root</span></div>
+                    <div class="chakra-bar"><span>Sacral</span></div>
+                    <div class="chakra-bar"><span>Solar</span></div>
+                    <div class="chakra-bar"><span>Heart</span></div>
+                    <div class="chakra-bar"><span>Throat</span></div>
+                    <div class="chakra-bar"><span>3rd Eye</span></div>
+                    <div class="chakra-bar"><span>Crown</span></div>
+                </div>
+
+                <div class="controls-section">
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label class="control-label">Tuning System</label>
+                            <select id="tuningSystem">
+                                <option value="scientific">Scientific (256-480 Hz)</option>
+                                <option value="solfeggio">Solfeggio (396-963 Hz)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Instrument / Sound</label>
+                            <select id="instrument">
+                                <option value="piano">Grand Piano</option>
+                                <option value="bowls">Tibetan Singing Bowls</option>
+                                <option value="sine">Pure Sine Wave</option>
+                                <option value="square">Square Wave</option>
+                                <option value="binaural">Binaural Beats</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Background Ambience</label>
+                            <select id="ambience">
+                                <option value="rain">Gentle Rain</option>
+                                <option value="none">None</option>
+                                <option value="ocean">Ocean Waves</option>
+                                <option value="forest">Forest Sounds</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Download Format</label>
+                            <select id="format">
+                                <option value="wav">WAV (Highest Quality)</option>
+                                <option value="mp3">MP3 (Compressed)</option>
+                                <option value="ogg">OGG (Open Source)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="slider-control">
+                        <div class="slider-header">
+                            <label class="control-label">Minutes per Chakra</label>
+                            <span id="minutesValue" class="slider-value">5</span>
+                        </div>
+                        <input type="range" id="minutes" min="1" max="15" value="5">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="volumeSweep">
+                        <label for="volumeSweep" class="checkbox-label">Volume Sweep: Quiet Root → Loud Crown</label>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" id="playBtn">▶ Begin Chakra Journey</button>
+                        <button class="btn-secondary" id="downloadBtn">⬇ Download Song</button>
+                    </div>
+
+                    <div class="info-bar">
+                        <p class="info-highlight">✨ Real-time browser playback • Smooth crossfades • Soft chime transitions</p>
+                        <p id="journeyDuration">[35] minute journey through all 7 chakras</p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="audio-library">
+                <div class="section-header">
+                    <h2 class="section-title">Pre-Made Healing Journeys</h2>
+                    <p class="section-subtitle">Ready-to-play chakra activation audio • Perfect for immediate meditation</p>
+                </div>
+
+                <div class="track-card">
+                    <div class="track-header">
+                        <h3 class="track-title">7-Minute Chakra Healing</h3>
+                        <span class="track-duration">7:00</span>
+                    </div>
+                    <p class="track-description">
+                        Complete 7-chakra journey using scientific tuning (C4-B4 scale, 256-480 Hz) with grand piano. 1 minute per chakra with smooth crossfades, gentle chime transitions, and rain ambience.
+                    </p>
+                    <div class="track-tags">
+                        <span class="tag">Meditation</span>
+                        <span class="tag">Healing</span>
+                        <span class="tag">ChakraNote</span>
+                        <span class="tag">Piano</span>
+                        <span class="tag">Rain</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="quote-section">
+                <p class="quote-text">"If you want to find the secrets of the universe, think in terms of energy, frequency and vibration."</p>
+                <p class="quote-author">— Nikola Tesla</p>
+            </div>
+
+            <div class="trademarks">
+                <span class="trademark">MedBed Spa™</span>
+                <span class="trademark">MedBed Capsule™</span>
+                <span class="trademark">MedBed Pets™</span>
+            </div>
+
+            <p class="copyright">
+                © 2025 All trademarks are the property of their respective owners.<br>
+                © 2025 Frequency & Vibration. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Slider update
+        const minutesSlider = document.getElementById('minutes');
+        const minutesValue = document.getElementById('minutesValue');
+        const journeyDuration = document.getElementById('journeyDuration');
+
+        minutesSlider.addEventListener('input', (e) => {
+            const minutes = e.target.value;
+            minutesValue.textContent = minutes;
+            journeyDuration.textContent = `[${minutes * 7}] minute journey through all 7 chakras`;
+        });
+
+        // Play button toggle
+        const playBtn = document.getElementById('playBtn');
+        let isPlaying = false;
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                playBtn.textContent = '⏸ Stop Journey';
+                playBtn.className = 'btn-stop';
+                // Add your audio playback logic here
+                simulatePlayback();
+            } else {
+                playBtn.textContent = '▶ Begin Chakra Journey';
+                playBtn.className = 'btn-primary';
+                // Add your audio stop logic here
+            }
+        });
+
+        // Simulate chakra progression
+        function simulatePlayback() {
+            const bars = document.querySelectorAll('.chakra-bar');
+            bars.forEach((bar, index) => {
+                setTimeout(() => {
+                    if (isPlaying) {
+                        bar.style.transform = 'scaleY(1.2)';
+                        bar.style.filter = 'brightness(1.3)';
+                        setTimeout(() => {
+                            bar.style.transform = 'scaleY(1)';
+                            bar.style.filter = 'brightness(1)';
+                        }, 300);
+                    }
+                }, index * 1000);
+            });
+        }
+
+        // Download button
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.addEventListener('click', () => {
+            downloadBtn.textContent = 'Preparing Download...';
+            downloadBtn.classList.add('loading');
+            
+            setTimeout(() => {
+                downloadBtn.textContent = '⬇ Download Song';
+                downloadBtn.classList.remove('loading');
+                // Add your actual download logic here
+            }, 2000);
+        });
+
+        // Chakra bar interactions
+        const chakraBars = document.querySelectorAll('.chakra-bar');
+        chakraBars.forEach((bar, index) => {
+            bar.addEventListener('click', () => {
+                const chakraNames = ['Root', 'Sacral', 'Solar Plexus', 'Heart', 'Throat', 'Third Eye', 'Crown'];
+                const frequencies = ['256 Hz', '288 Hz', '320 Hz', '341 Hz', '384 Hz', '426 Hz', '480 Hz'];
+                console.log(`${chakraNames[index]} Chakra - ${frequencies[index]}`);
+            });
+        });
+    </script>
+</body>
+</html>
