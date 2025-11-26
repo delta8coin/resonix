@@ -453,7 +453,7 @@ export default function PreviewPage() {
                 ✨ ChakraNote Exact Frequency
               </h2>
               <p className="text-[var(--text-secondary)] font-medium mb-2 tracking-tight">
-                Or listen on your phone or online
+                Listen on your phone or online or download the track to play later
               </p>
               <p className="text-[var(--text-secondary)] font-medium mb-2 tracking-tight">
                 Scientific Tuning (C4–B4 Scale) • 256–480 Hz
