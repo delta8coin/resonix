@@ -11,7 +11,7 @@ import {
 } from '@/lib/resonixChakraSynth';
 
 export default function ChakraActivator() {
-  const [tuning, setTuning] = useState<TuningSystem>('solfeggio');
+  const [tuning, setTuning] = useState<TuningSystem>('scientific');
   const [instrument, setInstrument] = useState<InstrumentType>('piano');
   const [minutesPerChakra, setMinutesPerChakra] = useState(7);
   const [volumeSweep, setVolumeSweep] = useState(true);
@@ -719,10 +719,10 @@ export default function ChakraActivator() {
                 <span className="text-3xl">✨</span>
               </div>
               <p className="text-amber-100 text-lg font-semibold mb-1">
-                Scientific Tuning (C4–B4 Scale) • 256–480 Hz
+                Recommended: Scientific Tuning (C4–B4 Scale) • 256–480 Hz
               </p>
               <p className="text-amber-200/80 text-sm">
-                Precision-mapped chakra frequencies to musical notes • Grand piano with gentle rain ambience
+                Precision-mapped chakra frequencies to musical notes • Grand piano with gentle rain ambience • Best for meditation & healing
               </p>
               {isChakraNoteExact && (
                 <div className="mt-3 inline-block px-4 py-2 bg-white/20 rounded-full text-sm font-semibold">
@@ -811,13 +811,20 @@ export default function ChakraActivator() {
                     key={t}
                     onClick={() => setTuning(t)}
                     disabled={isPlaying}
-                    className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+                    className={`relative flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
                       tuning === t
                         ? 'bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg shadow-purple-500/50'
                         : 'bg-gray-800 hover:bg-gray-700'
                     }`}
                   >
-                    {t === 'scientific' ? 'Scientific (256-480 Hz)' : 'Solfeggio (396-963 Hz)'}
+                    <div className="flex flex-col items-center gap-1">
+                      <span>{t === 'scientific' ? 'Scientific (256-480 Hz)' : 'Solfeggio (396-963 Hz)'}</span>
+                      {t === 'scientific' && (
+                        <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full border border-green-500/30">
+                          ✓ Recommended
+                        </span>
+                      )}
+                    </div>
                   </button>
                 ))}
               </div>
