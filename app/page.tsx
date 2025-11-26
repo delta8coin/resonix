@@ -429,7 +429,11 @@ export default function PreviewPage() {
             )}
 
             {/* Chakra Preview Buttons */}
-            <div className="grid grid-cols-7 gap-3 p-6 bg-[var(--tesla-dark)] border-b border-[var(--border)]">
+            <div className="p-6 bg-[var(--tesla-dark)] border-b border-[var(--border)]">
+              <p className="text-center text-sm text-[var(--text-secondary)] mb-4 uppercase tracking-wider">
+                Click to Play Sound
+              </p>
+              <div className="grid grid-cols-7 gap-3">
               {chakraData.map((data, i) => (
                 <button
                   key={data.chakra}
@@ -451,6 +455,7 @@ export default function PreviewPage() {
                   )}
                 </button>
               ))}
+              </div>
             </div>
 
             {/* Controls Section */}
