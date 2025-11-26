@@ -302,7 +302,7 @@ export default function PreviewPage() {
               <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
                 Complete 7-chakra journey using scientific tuning (C4-B4 scale, 256-480 Hz) with grand piano. 1 minute per chakra with smooth crossfades, gentle chime transitions, and rain ambience.
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 mb-6">
                 {['Meditation', 'Healing', 'ChakraNote', 'Piano', 'Rain'].map((tag) => (
                   <span
                     key={tag}
@@ -311,6 +311,15 @@ export default function PreviewPage() {
                     {tag}
                   </span>
                 ))}
+              </div>
+              {/* Track Actions */}
+              <div className="flex gap-3 pt-4 border-t border-[var(--border)]">
+                <button className="flex-1 px-6 py-3 bg-white text-black rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-[var(--tesla-off-white)] hover:shadow-lg hover:-translate-y-px">
+                  ▶ Play
+                </button>
+                <button className="px-6 py-3 bg-transparent text-white border-2 border-white rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-white hover:text-black">
+                  ↗ Share
+                </button>
               </div>
             </div>
           </section>
