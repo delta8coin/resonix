@@ -694,7 +694,7 @@ export default function ChakraActivator() {
             Turn Any Bed Into A MedBed
           </h1>
           <p className="text-gray-400 text-lg">
-            Synthesize personalized 7-chakra frequency journeys • Powered by Tone.js
+            Synthesize personalized 7-chakra frequency journeys
           </p>
         </div>
 
