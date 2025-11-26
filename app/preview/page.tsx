@@ -109,14 +109,14 @@ export default function PreviewPage() {
               </div>
             )}
 
-            {/* Chakra Bars */}
-            <div className="flex h-20 gap-px bg-black">
-              {['Root', 'Sacral', 'Solar', 'Heart', 'Throat', '3rd Eye', 'Crown'].map((chakra, i) => (
+            {/* Chakra Preview Buttons */}
+            <div className="grid grid-cols-7 gap-3 p-6 bg-[var(--tesla-dark)] border-b border-[var(--border)]">
+              {chakraData.map((data, i) => (
                 <button
-                  key={chakra}
-                  className="flex-1 relative group cursor-pointer transition-all duration-300 flex items-end justify-center pb-2"
+                  key={data.chakra}
+                  className="relative p-4 rounded border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg group"
                   style={{
-                    color: [
+                    borderColor: [
                       'var(--chakra-root)',
                       'var(--chakra-sacral)',
                       'var(--chakra-solar)',
@@ -125,15 +125,33 @@ export default function PreviewPage() {
                       'var(--chakra-third-eye)',
                       'var(--chakra-crown)',
                     ][i],
+                    backgroundColor: [
+                      'var(--chakra-root)',
+                      'var(--chakra-sacral)',
+                      'var(--chakra-solar)',
+                      'var(--chakra-heart)',
+                      'var(--chakra-throat)',
+                      'var(--chakra-third-eye)',
+                      'var(--chakra-crown)',
+                    ][i] + '22',
                   }}
+                  onClick={() => console.log(`Playing ${data.chakra} - ${data.frequency}`)}
                 >
-                  <div
-                    className="absolute bottom-0 left-0 right-0 h-[40%] group-hover:h-full transition-all duration-300"
-                    style={{ backgroundColor: 'currentColor' }}
+                  <div className="text-xs font-bold mb-1 text-white">{data.chakra}</div>
+                  <div className="text-xs opacity-75 text-white font-mono">{data.frequency}</div>
+                  <div className="absolute inset-0 rounded opacity-0 group-hover:opacity-50 transition-opacity"
+                    style={{
+                      backgroundColor: [
+                        'var(--chakra-root)',
+                        'var(--chakra-sacral)',
+                        'var(--chakra-solar)',
+                        'var(--chakra-heart)',
+                        'var(--chakra-throat)',
+                        'var(--chakra-third-eye)',
+                        'var(--chakra-crown)',
+                      ][i],
+                    }}
                   />
-                  <span className="relative z-10 text-xs font-semibold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-difference">
-                    {chakra}
-                  </span>
                 </button>
               ))}
             </div>
