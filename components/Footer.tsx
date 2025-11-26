@@ -25,6 +25,7 @@ export default function Footer() {
         <h4 className="text-base text-gray-800 font-semibold mb-6">Trademarks</h4>
         <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-gray-600 text-sm max-w-3xl mx-auto">
           <p>Resonix™</p>
+          <p>MedBed App™</p>
           <p>MedBed Spa™</p>
           <p>MedBed Capsule™</p>
           <p>MedBed Pets™</p>
