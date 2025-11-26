@@ -36,13 +36,6 @@ export default function Footer() {
           © 2025 All trademarks are the property of <a href="https://myresonix.vercel.app" className="text-purple-600 hover:text-purple-700 underline">https://myresonix.vercel.app</a>
         </p>
       </div>
-
-      {/* Copyright */}
-      <div className="text-center pt-4 border-t border-gray-200">
-        <p className="text-gray-500 text-xs">
-          © {new Date().getFullYear()} Frequency & Vibration. All rights reserved.
-        </p>
-      </div>
     </footer>
   );
 }
