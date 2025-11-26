@@ -129,6 +129,9 @@ export default function Footer() {
         <p className="text-gray-600 text-xs">
           © {new Date().getFullYear()} Frequency & Vibration. All rights reserved.
         </p>
+        <p className="text-gray-600 text-xs mt-2">
+          2025 Trademarks: MedBed™ Spa • MedBed™ Capsule • MedBed™ Pets
+        </p>
       </div>
     </footer>
   );
