@@ -691,7 +691,7 @@ export default function ChakraActivator() {
         {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent mb-4">
-            Chakra Activation Song Builder
+            Turn Any Bed Into A MedBed
           </h1>
           <p className="text-gray-400 text-lg">
             Synthesize personalized 7-chakra frequency journeys • Powered by Tone.js
