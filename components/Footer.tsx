@@ -24,6 +24,7 @@ export default function Footer() {
       <div className="text-center py-8 border-t border-gray-800/50">
         <h4 className="text-base text-gray-200 font-semibold mb-4">Trademarks</h4>
         <div className="space-y-2 text-gray-500 text-sm">
+          <p>Resonix™</p>
           <p>MedBed Spa™</p>
           <p>MedBed Capsule™</p>
           <p>MedBed Pets™</p>
