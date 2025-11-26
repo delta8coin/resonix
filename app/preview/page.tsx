@@ -23,8 +23,10 @@ export default function PreviewPage() {
   const [currentChakra, setCurrentChakra] = useState<number>(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [previewChakra, setPreviewChakra] = useState<number | null>(null);
+  const [isPreMadePlaying, setIsPreMadePlaying] = useState(false);
 
   const synthRef = useRef<Tone.PolySynth | Tone.FMSynth | Tone.Oscillator | null>(null);
+  const preMadeAudioRef = useRef<HTMLAudioElement | null>(null);
   const binauralLeftRef = useRef<Tone.Oscillator | null>(null);
   const binauralRightRef = useRef<Tone.Oscillator | null>(null);
   const backgroundNoiseRef = useRef<Tone.Noise | null>(null);
@@ -301,6 +303,41 @@ export default function PreviewPage() {
   };
 
   const progress = totalMinutes > 0 ? (timeElapsed / (totalMinutes * 60)) * 100 : 0;
+
+  const handlePreMadePlay = () => {
+    if (!preMadeAudioRef.current) {
+      preMadeAudioRef.current = new Audio('/audio/7-minute-chakra-activation.wav');
+      preMadeAudioRef.current.addEventListener('ended', () => {
+        setIsPreMadePlaying(false);
+      });
+    }
+
+    if (isPreMadePlaying) {
+      preMadeAudioRef.current.pause();
+      setIsPreMadePlaying(false);
+    } else {
+      preMadeAudioRef.current.play();
+      setIsPreMadePlaying(true);
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '7-Minute Chakra Healing - MedBed™',
+          text: 'Check out this 7-minute chakra healing journey with scientific tuning and grand piano',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Share failed:', err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -646,10 +683,16 @@ export default function PreviewPage() {
               </div>
               {/* Track Actions */}
               <div className="flex gap-3 pt-4 border-t border-[var(--border)]">
-                <button className="flex-1 px-6 py-3 bg-white text-black rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-[var(--tesla-off-white)] hover:shadow-lg hover:-translate-y-px">
-                  ▶ Play
+                <button
+                  onClick={handlePreMadePlay}
+                  className="flex-1 px-6 py-3 bg-white text-black rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-[var(--tesla-off-white)] hover:shadow-lg hover:-translate-y-px"
+                >
+                  {isPreMadePlaying ? '⏸ Pause' : '▶ Play'}
                 </button>
-                <button className="px-6 py-3 bg-transparent text-white border-2 border-white rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-white hover:text-black">
+                <button
+                  onClick={handleShare}
+                  className="px-6 py-3 bg-transparent text-white border-2 border-white rounded font-semibold uppercase text-sm tracking-wide transition-all hover:bg-white hover:text-black"
+                >
                   ↗ Share
                 </button>
               </div>
