@@ -1,6 +1,15 @@
 export default function Footer() {
   return (
     <footer className="py-20 px-[4%] border-t border-gray-800/50 mt-24">
+      {/* Logo */}
+      <div className="text-center mb-16">
+        <img
+          src="/logo.png"
+          alt="MedBed Logo"
+          className="mx-auto h-24 w-auto"
+        />
+      </div>
+
       {/* Tesla Quote */}
       <div className="text-center mb-16 py-20 bg-frequency-purple/5">
         <blockquote className="text-2xl md:text-3xl italic leading-relaxed text-gray-200 mb-5">
